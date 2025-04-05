@@ -23,17 +23,20 @@ export default function Home() {
   const [delay, setDelay] = useState(0);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const location = useLocation();
-  const path = location.pathname;
-  const { isLoading, data: datas } = useQuery<IGetMoviesResult>([path], () => {
-    if (path === "/popular") {
-      return getPopular();
-    } else if (path === "/coming-soon") {
-      return getComingSoon();
-    } else if (path === "/now-playing") {
-      return getNowPlaying();
+  const category = location?.state?.category || "popular";
+  const { isLoading, data: datas } = useQuery<IGetMoviesResult>(
+    [category],
+    () => {
+      if (category === "popular") {
+        return getPopular();
+      } else if (category === "coming-soon") {
+        return getComingSoon();
+      } else if (category === "now-playing") {
+        return getNowPlaying();
+      }
+      return getPopular(); // 기본값으로 인기 영화 데이터
     }
-    return getPopular(); // 기본값으로 인기 영화 데이터
-  });
+  );
   const { data: movieDetail, isLoading: isDetailLoading } =
     useQuery<IMovieData>(
       ["movieDetail", selectedId],
@@ -44,19 +47,22 @@ export default function Home() {
     );
   const navigate = useNavigate();
   const onBoxClicked = (movieId: number) => {
-    navigate(`/${path}/${movieId}`);
+    navigate(`/${category}/${movieId}`, { state: { category } });
     setSelectedId(`${movieId}`);
   };
-  const bigMovieMatch = useMatch(`/${path}/:movieId`);
+  const bigMovieMatch = useMatch(`/${category}/:movieId`);
   const clickedMovie =
     bigMovieMatch?.params.movieId &&
     datas?.results.find(
       (movie) => movie.id === Number(bigMovieMatch.params.movieId)
     );
-  console.log(clickedMovie);
-  const onOverlayClick = () => navigate(-1);
+  const onOverlayClick = () => {
+    navigate(`${category === "popular" ? "/" : "/" + category}`, {
+      state: { category },
+    });
+    setSelectedId(null);
+  };
   const { scrollY } = useScroll();
-  // console.log(datas);
 
   const cardVariants = {
     hidden: { scale: 0 },
@@ -105,7 +111,7 @@ export default function Home() {
             <AnimatePresence>
               {datas?.results.map((movie, index) => (
                 <MovieCard
-                  key={`${path}_${movie.id}`}
+                  key={`${category}_${movie.id}`}
                   custom={index} // 커스텀 값 전달
                   initial="hidden"
                   animate="visible"

@@ -26,18 +26,18 @@ export default function Header() {
       <Col>
         <Items>
           <Item>
-            <Link to="/">
+            <Link to={`/`} state={{ category: "popular" }}>
               POPULAR{" "}
               {(homeMatch || popularMatch) && <Circle layoutId="circle" />}
             </Link>
           </Item>
           <Item>
-            <Link to="/coming-soon">
+            <Link to={`/coming-soon`} state={{ category: "coming-soon" }}>
               COMING SOON {comingSoonMatch && <Circle layoutId="circle" />}
             </Link>
           </Item>
           <Item>
-            <Link to="/now-playing">
+            <Link to={`/now-playing`} state={{ category: "now-playing" }}>
               NOW PLAYING {nowPlayingMatch && <Circle layoutId="circle" />}
             </Link>
           </Item>
