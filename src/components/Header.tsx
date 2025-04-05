@@ -4,24 +4,21 @@ import { Link, useMatch } from "react-router-dom";
 import styled from "styled-components";
 
 export default function Header() {
-  const popularMatch = useMatch("/");
-  const comingSoonMatch = useMatch("/coming_soon");
-  const nowPlayingMatch = useMatch("/now_playing");
+  const homeMatch = useMatch("/");
+  const popularMatch = useMatch("/popular/:movieId");
+  const comingSoonMatch = useMatch("/coming-soon");
+  const nowPlayingMatch = useMatch("/now-playing");
   const { scrollY } = useScroll();
   const navAnimation = useAnimation();
 
   useEffect(() => {
-    const unsubscribe = scrollY.onChange((latest) => {
-      if (latest > 80) {
+    scrollY.on("change", () => {
+      if (scrollY.get() > 80) {
         navAnimation.start("scroll");
       } else {
         navAnimation.start("top");
       }
     });
-
-    return () => {
-      unsubscribe(); // clean-up
-    };
   }, [scrollY, navAnimation]);
 
   return (
@@ -30,16 +27,17 @@ export default function Header() {
         <Items>
           <Item>
             <Link to="/">
-              POPULAR {popularMatch && <Circle layoutId="circle" />}
+              POPULAR{" "}
+              {(homeMatch || popularMatch) && <Circle layoutId="circle" />}
             </Link>
           </Item>
           <Item>
-            <Link to="/coming_soon">
+            <Link to="/coming-soon">
               COMING SOON {comingSoonMatch && <Circle layoutId="circle" />}
             </Link>
           </Item>
           <Item>
-            <Link to="/now_playing">
+            <Link to="/now-playing">
               NOW PLAYING {nowPlayingMatch && <Circle layoutId="circle" />}
             </Link>
           </Item>

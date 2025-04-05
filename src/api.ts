@@ -7,6 +7,8 @@ interface IMovie {
   original_title: string;
   overview: string;
   id: number;
+  release_date: string;
+  vote_average: number;
 }
 export interface IGetMoviesResult {
   page: number;
@@ -31,8 +33,8 @@ export function getMovie(id: number) {
   return fetch(`${BASE_URL}/movie?id=${id}`).then((r) => r.json());
 }
 
-export function makeImagePath(image: string) {
-  return `https://image.tmdb.org/t/p/w500${image}`;
+export function makeImagePath(image: string, size?: string) {
+  return `https://image.tmdb.org/t/p/${size ? size : "w500"}${image}`;
 }
 
 export function makeBgPath(image: string) {
