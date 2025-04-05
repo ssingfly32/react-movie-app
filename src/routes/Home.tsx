@@ -34,7 +34,6 @@ export default function Home() {
     }
     return getPopular(); // 기본값으로 인기 영화 데이터
   });
-
   const { data: movieDetail, isLoading: isDetailLoading } =
     useQuery<IMovieData>(
       ["movieDetail", selectedId],
@@ -45,10 +44,10 @@ export default function Home() {
     );
   const navigate = useNavigate();
   const onBoxClicked = (movieId: number) => {
-    navigate(`/popular/${movieId}`);
+    navigate(`/${path}/${movieId}`);
     setSelectedId(`${movieId}`);
   };
-  const bigMovieMatch = useMatch("/popular/:movieId");
+  const bigMovieMatch = useMatch(`/${path}/:movieId`);
   const clickedMovie =
     bigMovieMatch?.params.movieId &&
     datas?.results.find(
@@ -106,7 +105,7 @@ export default function Home() {
             <AnimatePresence>
               {datas?.results.map((movie, index) => (
                 <MovieCard
-                  key={`popular_${movie.id}`}
+                  key={`${path}_${movie.id}`}
                   custom={index} // 커스텀 값 전달
                   initial="hidden"
                   animate="visible"
