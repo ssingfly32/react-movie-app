@@ -1,5 +1,7 @@
 import {
+  getComingSoon,
   getMovie,
+  getNowPlaying,
   getPopular,
   IGetMoviesResult,
   IMovieData,
@@ -8,16 +10,31 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { AnimatePresence, motion, useScroll } from "framer-motion";
 import { useState } from "react";
-import { useMatch, useNavigate } from "react-router-dom";
+import {
+  useLocation,
+  useMatch,
+  useNavigate,
+  useSearchParams,
+} from "react-router-dom";
 import styled from "styled-components";
 
 export default function Home() {
+  useSearchParams;
   const [delay, setDelay] = useState(0);
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const { isLoading, data: datas } = useQuery<IGetMoviesResult>(
-    ["popular"],
-    getPopular
-  );
+  const location = useLocation();
+  const path = location.pathname;
+  const { isLoading, data: datas } = useQuery<IGetMoviesResult>([path], () => {
+    if (path === "/popular") {
+      return getPopular();
+    } else if (path === "/coming-soon") {
+      return getComingSoon();
+    } else if (path === "/now-playing") {
+      return getNowPlaying();
+    }
+    return getPopular(); // 기본값으로 인기 영화 데이터
+  });
+
   const { data: movieDetail, isLoading: isDetailLoading } =
     useQuery<IMovieData>(
       ["movieDetail", selectedId],
@@ -212,17 +229,20 @@ export default function Home() {
                                     : "none"}
                                 </InfoText>
                               </AdditionalInfo>
-                              {movieDetail.homepage ? (
-                                <InfoLink
-                                  href={movieDetail.homepage}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                >
-                                  {movieDetail.homepage}
-                                </InfoLink>
-                              ) : (
-                                <InfoText>none</InfoText>
-                              )}
+                              <AdditionalInfo>
+                                <InfoTitle>Homepage</InfoTitle>
+                                {movieDetail.homepage ? (
+                                  <InfoLink
+                                    href={movieDetail.homepage}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                  >
+                                    {movieDetail.homepage}
+                                  </InfoLink>
+                                ) : (
+                                  <InfoText>none</InfoText>
+                                )}
+                              </AdditionalInfo>
                             </>
                           )}
                           <Spacing />
