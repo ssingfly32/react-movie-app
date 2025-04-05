@@ -10,11 +10,20 @@ interface IMovie {
   release_date: string;
   vote_average: number;
 }
+
 export interface IGetMoviesResult {
   page: number;
   results: IMovie[];
   total_pages: number;
   total_results: number;
+}
+
+export interface IMovieData {
+  budget: number;
+  revenue: number;
+  genres: { id: number; name: string }[];
+  runtime: number;
+  homepage: string;
 }
 
 export function getPopular() {

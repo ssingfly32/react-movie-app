@@ -1,4 +1,10 @@
-import { getPopular, IGetMoviesResult, makeImagePath } from "../api";
+import {
+  getMovie,
+  getPopular,
+  IGetMoviesResult,
+  IMovieData,
+  makeImagePath,
+} from "../api";
 import { useQuery } from "@tanstack/react-query";
 import { AnimatePresence, motion, useScroll } from "framer-motion";
 import { useState } from "react";
@@ -7,13 +13,23 @@ import styled from "styled-components";
 
 export default function Home() {
   const [delay, setDelay] = useState(0);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
   const { isLoading, data: datas } = useQuery<IGetMoviesResult>(
     ["popular"],
     getPopular
   );
+  const { data: movieDetail, isLoading: isDetailLoading } =
+    useQuery<IMovieData>(
+      ["movieDetail", selectedId],
+      () => getMovie(Number(selectedId!)),
+      {
+        enabled: !!selectedId, // selectedId가 존재할 때만 요청함
+      }
+    );
   const navigate = useNavigate();
   const onBoxClicked = (movieId: number) => {
     navigate(`/popular/${movieId}`);
+    setSelectedId(`${movieId}`);
   };
   const bigMovieMatch = useMatch("/popular/:movieId");
   const clickedMovie =
@@ -24,7 +40,7 @@ export default function Home() {
   console.log(clickedMovie);
   const onOverlayClick = () => navigate(-1);
   const { scrollY } = useScroll();
-  console.log(datas);
+  // console.log(datas);
 
   const cardVariants = {
     hidden: { scale: 0 },
@@ -138,6 +154,7 @@ export default function Home() {
                       >
                         <CoverOverlay />
                       </BigCover>
+
                       <BigContent>
                         <HeaderInfo>
                           <BigTitle>{clickedMovie.title}</BigTitle>
@@ -157,8 +174,57 @@ export default function Home() {
                             )}
                           </MetaInfo>
                         </HeaderInfo>
+
                         <ScrollableContent>
                           <BigOverview>{clickedMovie.overview}</BigOverview>
+                          {!isDetailLoading && movieDetail && (
+                            <>
+                              {movieDetail.genres && (
+                                <GenreList>
+                                  {movieDetail.genres.map((genre) => (
+                                    <GenreTag key={genre.id}>
+                                      {genre.name}
+                                    </GenreTag>
+                                  ))}
+                                </GenreList>
+                              )}
+                              <AdditionalInfo>
+                                <InfoTitle>Budget</InfoTitle>
+                                <InfoText>
+                                  {movieDetail.budget > 0
+                                    ? `$${movieDetail.budget.toLocaleString()}`
+                                    : "none"}
+                                </InfoText>
+                              </AdditionalInfo>
+                              <AdditionalInfo>
+                                <InfoTitle>Revenue</InfoTitle>
+                                <InfoText>
+                                  {movieDetail.revenue > 0
+                                    ? `$${movieDetail.revenue.toLocaleString()}`
+                                    : "none"}
+                                </InfoText>
+                              </AdditionalInfo>
+                              <AdditionalInfo>
+                                <InfoTitle>Runtime</InfoTitle>
+                                <InfoText>
+                                  {movieDetail.runtime
+                                    ? `${movieDetail.runtime} minutes`
+                                    : "none"}
+                                </InfoText>
+                              </AdditionalInfo>
+                              {movieDetail.homepage ? (
+                                <InfoLink
+                                  href={movieDetail.homepage}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                >
+                                  {movieDetail.homepage}
+                                </InfoLink>
+                              ) : (
+                                <InfoText>none</InfoText>
+                              )}
+                            </>
+                          )}
                           <Spacing />
                         </ScrollableContent>
                       </BigContent>
@@ -304,6 +370,21 @@ const ScrollableContent = styled.div`
   padding: 0 30px 20px;
   overflow-y: auto;
   flex: 1;
+
+  /* 스크롤바 스타일링 */
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.3);
+    border-radius: 3px;
+  }
 `;
 
 const BigOverview = styled.p`
@@ -311,6 +392,44 @@ const BigOverview = styled.p`
   line-height: 1.6;
   color: #ddd;
   margin: 0 0 20px 0;
+`;
+
+const GenreList = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 20px;
+`;
+
+const GenreTag = styled.span`
+  background-color: rgba(255, 255, 255, 0.1);
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 14px;
+  color: #ddd;
+`;
+
+const AdditionalInfo = styled.div`
+  margin-bottom: 16px;
+`;
+
+const InfoTitle = styled.h4`
+  font-size: 16px;
+  font-weight: 600;
+  color: #aaa;
+  margin: 0 0 4px 0;
+`;
+
+const InfoText = styled.p`
+  font-size: 15px;
+  color: #ddd;
+  margin: 0;
+`;
+
+const InfoLink = styled.a`
+  color: #ddd;
+  text-decoration: none;
+  cursor: pointer;
 `;
 
 const Spacing = styled.div`
@@ -337,6 +456,14 @@ const MovieGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 20px;
+
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (max-width: 480px) {
+    grid-template-columns: 1fr;
+  }
 `;
 
 const MovieCard = styled(motion.div)`
