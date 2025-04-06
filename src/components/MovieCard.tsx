@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   MovieCardContainer,
   MovieInfo,
@@ -21,16 +21,21 @@ const MovieCard: React.FC<MovieCardProps> = ({
   index,
   onCardClick,
 }) => {
+  const [delay, setDelay] = useState(0);
   const cardVariants = {
     hidden: { scale: 0 },
-    visible: (i: number) => ({
-      scale: 1,
-      transition: {
-        delay: i * 0.2,
-        duration: 0.2,
-        ease: "easeInOut",
-      },
-    }),
+    visible: (i: number) => {
+      const realDelay = delay === 0 ? i * 0.2 : delay;
+
+      return {
+        scale: 1,
+        transition: {
+          delay: realDelay,
+          duration: 0.2,
+          ease: "easeInOut",
+        },
+      };
+    },
   };
 
   return (
@@ -53,6 +58,7 @@ const MovieCard: React.FC<MovieCardProps> = ({
         transition: { duration: 0.1, ease: "easeInOut" },
       }}
       onClick={() => onCardClick(id)}
+      onAnimationComplete={() => setDelay(0.2)}
     >
       <MoviePoster
         src={`https://image.tmdb.org/t/p/w500${posterPath}`}
