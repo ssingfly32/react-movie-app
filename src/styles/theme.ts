@@ -20,7 +20,7 @@ export const lightTheme: DefaultTheme = {
   background: "#f4f4f4",
   text: "#000000",
   accent: "#FFD700",
-  cardBackground: "#ffffff",
+  cardBackground: "rgba(244, 244, 244, 1)",
   overlay: "rgba(255, 255, 255, 0.7)",
   modalBackground: "#ffffff",
   hoverEffect: "rgba(0, 0, 0, 0.3)",

@@ -43,7 +43,7 @@ export const CloseButton = styled.button`
   transition: all 0.2s ease;
 
   &:hover {
-    background-color: ${(props) => props.theme.hoverEffect};
+    background-color: #555555;
     transform: scale(1.1);
   }
 `;
