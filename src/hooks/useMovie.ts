@@ -34,7 +34,7 @@ export function useMovies() {
 export function useMovieDetail(movieId: string | null) {
   const { data, isLoading } = useQuery<IMovieData>(
     ["movieDetail", movieId],
-    () => getMovie(Number(movieId!)),
+    () => getMovie(Number(movieId)),
     {
       enabled: !!movieId, // movieId가 존재할 때만 요청함
     }

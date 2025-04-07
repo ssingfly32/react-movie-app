@@ -4,6 +4,7 @@ import { useMovies } from "../hooks/useMovie";
 import { HomeContainer, Loader, MovieGrid } from "../styles/HomeStyles";
 import MovieCard from "../components/MovieCard";
 import MovieDetail from "../components/MovieDetail";
+import useScrollControl from "../hooks/useScrollControl";
 
 export default function Home() {
   const { isLoading, movies, category } = useMovies();
@@ -22,6 +23,8 @@ export default function Home() {
   const handleDetailClose = () => {
     navigate(`${category === "popular" ? "/" : "/" + category}`);
   };
+
+  useScrollControl(!!bigMovieMatch);
 
   return (
     <HomeContainer>
@@ -47,7 +50,7 @@ export default function Home() {
           <AnimatePresence>
             {bigMovieMatch && clickedMovie && (
               <MovieDetail
-                movieId={bigMovieMatch.params.movieId!}
+                movieId={bigMovieMatch?.params?.movieId || ""}
                 movie={clickedMovie}
                 onClose={handleDetailClose}
                 category={category}

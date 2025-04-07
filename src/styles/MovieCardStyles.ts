@@ -6,9 +6,10 @@ export const MovieCardContainer = styled(motion.div)`
   flex-direction: column;
   width: 100%;
   max-width: 300px;
-  border-radius: 8px;
+  border-radius: 8px 8px 0 0;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s ease;
+  background-color: ${(props) => props.theme.cardBackground};
   cursor: pointer;
 `;
 
@@ -16,7 +17,7 @@ export const MoviePoster = styled.img`
   width: 100%;
   aspect-ratio: 2 / 3; // 이미지만 비율 유지
   object-fit: cover;
-  border-radius: 16px 16px 0 0; // 상단 모서리만 둥글게
+  border-radius: 8px 8px 0 0; // 상단 모서리만 둥글게
 `;
 
 export const MovieInfo = styled.div`
