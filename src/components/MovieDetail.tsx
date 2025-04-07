@@ -83,6 +83,8 @@ const MovieDetail: React.FC<MovieDetailProps> = ({
               movie.backdrop_path,
               "original"
             )})`,
+            backgroundSize: "cover",
+            backgroundPosition: "center top",
           }}
         >
           <CoverOverlay />
